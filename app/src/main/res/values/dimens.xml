@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="margin">16dp</dimen>
+    <dimen name="margin_half">8dp</dimen>
+    <dimen name="margin_double">32dp</dimen>
+    <dimen name="padding">16dp</dimen>
+    <dimen name="padding_half">8dp</dimen>
+    <dimen name="padding_double">32dp</dimen>
+
+    <dimen name="text_small_size">12sp</dimen>
+    <dimen name="text_medium_size">16sp</dimen>
+    <dimen name="text_big_size">32sp</dimen>
+    <dimen name="text_extrabig_size">64sp</dimen>
+    <dimen name="text_extrasmall_size">8sp</dimen>
+
+
+    <dimen name="text_time_big_size">64sp</dimen>
+    <dimen name="text_time_small_size">32sp</dimen>
+
+</resources>
