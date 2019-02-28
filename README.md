@@ -1,2 +1,2 @@
 # android-simply-chronometer
-Simply chronometer app using Java and Android
+Simple chronometer app using Java and Android
