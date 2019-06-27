@@ -9,10 +9,10 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String SECONDS_TAG = "Seconds";
-    private static final String MILLISECONDS_TAG = "Milliseconds";
-    private static final String MILLISECONDS_COUNTER_TAG = "MillisecondsCounter";
-    private static final String IS_CHRONO_RUNNING_TAG = "IsChronoRunning";
+    private static final String SECONDS_TAG = "seconds";
+    private static final String MILLISECONDS_TAG = "milliseconds";
+    private static final String MILLISECONDS_COUNTER_TAG = "millisecondsCounter";
+    private static final String IS_CHRONO_RUNNING_TAG = "isChronoRunning";
 
     private boolean isChronoRunning;
     private int seconds = 0;
