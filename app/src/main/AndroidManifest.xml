@@ -4,19 +4,28 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity android:name=".MainActivity">
-            <intent-filter>
+            <intent-filter android:label="@string/filter_title_chronos_app">
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <data
+                    android:scheme="https"
+                    android:host="www.carlosarryoam.github.io"
+                    android:pathPrefix="/chronos" />
             </intent-filter>
         </activity>
 
-        <service android:name=".ChronoService"
+        <service
+            android:name=".services.ChronoService"
             android:enabled="true"
             android:exported="false" />
     </application>

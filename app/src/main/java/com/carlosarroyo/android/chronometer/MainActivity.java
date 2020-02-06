@@ -1,107 +1,121 @@
+/*
+ * Copyright 2019 Carlos Alberto Arroyo Martínez.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package com.carlosarroyo.android.chronometer;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 
+import com.carlosarroyo.android.chronometer.services.ChronoService;
+
+/**
+ * @author Carlos Alberto Arroyo Martinez <carlosarroyoam@gmail.com>
+ */
 public class MainActivity extends AppCompatActivity {
 
-    private static final String SECONDS_TAG = "seconds";
-    private static final String MILLISECONDS_TAG = "milliseconds";
-    private static final String MILLISECONDS_COUNTER_TAG = "millisecondsCounter";
-    private static final String IS_CHRONO_RUNNING_TAG = "isChronoRunning";
+	private static final String TAG = MainActivity.class.getSimpleName();
+	private ChronoService mChronoService;
+	private boolean mBound = false;
+	private AlphaAnimation buttonClickAnimation = new AlphaAnimation(1F, 0.6F);
 
-    private boolean isChronoRunning;
-    private int seconds = 0;
-    private int milliseconds = 0;
-    private int millisecondsCounter = 1;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+	}
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        startRunningChrono();
-    }
+	@Override
+	protected void onStart() {
+		super.onStart();
+		Intent intent = new Intent(this, ChronoService.class);
+		startService(intent);
+		bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+	}
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(SECONDS_TAG, seconds);
-        outState.putInt(MILLISECONDS_TAG, milliseconds);
-        outState.putInt(MILLISECONDS_COUNTER_TAG, millisecondsCounter);
-        outState.putBoolean(IS_CHRONO_RUNNING_TAG, isChronoRunning);
-    }
+	@Override
+	protected void onStop() {
+		super.onStop();
+		unbindService(mServiceConnection);
+		mBound = false;
+	}
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        seconds = savedInstanceState.getInt(SECONDS_TAG);
-        milliseconds = savedInstanceState.getInt(MILLISECONDS_TAG);
-        millisecondsCounter = savedInstanceState.getInt(MILLISECONDS_COUNTER_TAG);
-        isChronoRunning = savedInstanceState.getBoolean(IS_CHRONO_RUNNING_TAG);
-    }
+	@Override
+	protected void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+	}
 
-    private AlphaAnimation buttonClickAnimation = new AlphaAnimation(1F, 0.7F);
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+	}
 
-    public void onClickStart(View view) {
-        isChronoRunning = true;
-        view.startAnimation(buttonClickAnimation);
-    }
+	public void onClickStart(View view) {
+		mChronoService.start();
+		view.startAnimation(buttonClickAnimation);
+		updateIU();
+	}
 
-    public void onClickPause(View view) {
-        isChronoRunning = false;
-        view.startAnimation(buttonClickAnimation);
-    }
+	public void onClickPause(View view) {
+		mChronoService.pause();
+		view.startAnimation(buttonClickAnimation);
+	}
 
-    public void onClickReset(View view) {
-        isChronoRunning = false;
-        seconds = 0;
-        milliseconds = 0;
-        millisecondsCounter = 1;
-        view.startAnimation(buttonClickAnimation);
-    }
+	public void onClickReset(View view) {
+		mChronoService.reset();
+		view.startAnimation(buttonClickAnimation);
+	}
 
-    private void startRunningChrono() {
-        final TextView timeEdittext = findViewById(R.id.txt_seconds);
-        final TextView millisEdittext = findViewById(R.id.txt_millis);
-        final Handler handler = new Handler();
+	public void updateIU() {
+		final TextView timeEditText = findViewById(R.id.txt_seconds);
+		final TextView millisEditText = findViewById(R.id.txt_millis);
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                int hoursInt = seconds / 3600;
-                int minutesInt = (seconds % 3600) / 60;
-                int secondsInt = seconds % 60;
+		final Handler handler = new Handler();
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				timeEditText.setText(mChronoService.getFullTime());
+				millisEditText.setText(mChronoService.getMillisecondsTime());
+				handler.postDelayed(this, 0);
+			}
+		});
+	}
 
-                String hoursString = hoursInt > 0 ? String.format("%d:", hoursInt) : "";
-                String minutesString = minutesInt > 0 ? String.format("%02d:", minutesInt) : "";
-                String secondsString = String.format("%02d", secondsInt);
-                int millisTime = milliseconds / 10;
+	/**
+	 * Defines callbacks for service binding, passed to bindService()
+	 */
+	private ServiceConnection mServiceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			// We've bound to LocalService, cast the IBinder and get LocalService instance
+			ChronoService.LocalBinder binder = (ChronoService.LocalBinder) service;
+			mChronoService = binder.getService();
+			mBound = true;
+			Log.d(TAG, "onServiceConnected: ");
+		}
 
-                String fullTimeString = hoursString + minutesString + secondsString;
-                String millisString = String.format("%02d", millisTime);
-
-                timeEdittext.setText(fullTimeString);
-                millisEdittext.setText(millisString);
-
-                if (isChronoRunning) {
-                    milliseconds = milliseconds + 10;
-
-                    if (millisecondsCounter < 100) {
-                        millisecondsCounter++;
-
-                    } else if (millisecondsCounter == 100) {
-                        MainActivity.this.seconds++;
-                        millisecondsCounter = 1;
-                        milliseconds = 0;
-                    }
-                }
-
-                handler.postDelayed(this, 10);
-            }
-        });
-    }
+		@Override
+		public void onServiceDisconnected(ComponentName arg0) {
+			mBound = false;
+			Log.d(TAG, "onServiceDisconnected: ");
+		}
+	};
 }
