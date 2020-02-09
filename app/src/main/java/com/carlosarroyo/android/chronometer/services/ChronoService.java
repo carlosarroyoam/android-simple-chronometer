@@ -10,6 +10,8 @@
 
 package com.carlosarroyo.android.chronometer.services;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -17,6 +19,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
+
+import com.carlosarroyo.android.chronometer.App;
+import com.carlosarroyo.android.chronometer.MainActivity;
+import com.carlosarroyo.android.chronometer.R;
 
 import java.util.Locale;
 
@@ -26,16 +32,15 @@ import java.util.Locale;
 public class ChronoService extends Service {
 
 	private static final String TAG = ChronoService.class.getSimpleName();
+	private static final int NOTIFICATION_ID = 12887952;
 	private final IBinder binder = new LocalBinder();
-
-	final Handler mHandler = new Handler();
 
 	/* Chronos variables */
 	private long mStartTime, mTimeMinusStart, mTimeWhenPaused, mCurrentMilliseconds;
 	private int mHours, mMinutes, mSeconds, mMilliseconds;
+	private String mFullTimeString = "00", mMillisString = "00";
 
-
-	private String mFullTimeString, mMillisString;
+	final Handler mHandler = new Handler();
 
 	/**
 	 *
@@ -58,6 +63,8 @@ public class ChronoService extends Service {
 
 			mFullTimeString = hoursString + minutesString + secondsString;
 			mMillisString = String.format(Locale.US, "%02d", mMilliseconds);
+
+			Log.d(TAG, "run: " + mFullTimeString);
 
 			mHandler.postDelayed(this, 0);
 		}
@@ -83,8 +90,15 @@ public class ChronoService extends Service {
 		return super.onStartCommand(intent, flags, startId);
 	}
 
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		Log.d(TAG, "onDestroy: ");
+	}
+
 	/* Client methods */
 	public void start() {
+		createNotification();
 		mStartTime = SystemClock.uptimeMillis();
 		mHandler.postDelayed(mRunnable, 0);
 	}
@@ -108,6 +122,7 @@ public class ChronoService extends Service {
 		mMillisString = "00";
 
 		mHandler.removeCallbacks(mRunnable);
+		stopForeground(STOP_FOREGROUND_REMOVE);
 	}
 
 	public String getFullTime() {
@@ -116,6 +131,21 @@ public class ChronoService extends Service {
 
 	public String getMillisecondsTime() {
 		return mMillisString;
+	}
+
+	private void createNotification() {
+		Intent intent = new Intent(this, MainActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+		Notification notification = new Notification.Builder(this, App.CHRONOMETER_CHANNEL_ID)
+				.setContentTitle(getText(R.string.chronometer_notification_title))
+				.setContentText(getText(R.string.chronometer_notification_content))
+				.setSmallIcon(R.drawable.ic_launcher_foreground)
+				.setContentIntent(pendingIntent)
+				.build();
+
+		startForeground(NOTIFICATION_ID, notification);
 	}
 
 }

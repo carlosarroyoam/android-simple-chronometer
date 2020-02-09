@@ -14,16 +14,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Handler;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.carlosarroyo.android.chronometer.services.ChronoService;
 
@@ -58,30 +57,26 @@ public class MainActivity extends AppCompatActivity {
 		mBound = false;
 	}
 
-	@Override
-	protected void onSaveInstanceState(@NonNull Bundle outState) {
-		super.onSaveInstanceState(outState);
-	}
-
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-	}
-
 	public void onClickStart(View view) {
-		mChronoService.start();
-		view.startAnimation(buttonClickAnimation);
-		updateIU();
+		if (mBound) {
+			mChronoService.start();
+			updateIU();
+			view.startAnimation(buttonClickAnimation);
+		}
 	}
 
 	public void onClickPause(View view) {
-		mChronoService.pause();
-		view.startAnimation(buttonClickAnimation);
+		if (mBound) {
+			mChronoService.pause();
+			view.startAnimation(buttonClickAnimation);
+		}
 	}
 
 	public void onClickReset(View view) {
-		mChronoService.reset();
-		view.startAnimation(buttonClickAnimation);
+		if (mBound) {
+			mChronoService.reset();
+			view.startAnimation(buttonClickAnimation);
+		}
 	}
 
 	public void updateIU() {
@@ -105,10 +100,10 @@ public class MainActivity extends AppCompatActivity {
 	private ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
-			// We've bound to LocalService, cast the IBinder and get LocalService instance
 			ChronoService.LocalBinder binder = (ChronoService.LocalBinder) service;
 			mChronoService = binder.getService();
 			mBound = true;
+			updateIU();
 			Log.d(TAG, "onServiceConnected: ");
 		}
 
