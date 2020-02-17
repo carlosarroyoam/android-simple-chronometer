@@ -37,8 +37,7 @@ public class App extends Application {
 
 			NotificationChannel channel = new NotificationChannel(CHRONOMETER_CHANNEL_ID, name, importance);
 			channel.setDescription(description);
-			// Register the channel with the system; you can't change the importance
-			// or other notification behaviors after this
+
 			NotificationManager notificationManager = getSystemService(NotificationManager.class);
 			notificationManager.createNotificationChannel(channel);
 		}
