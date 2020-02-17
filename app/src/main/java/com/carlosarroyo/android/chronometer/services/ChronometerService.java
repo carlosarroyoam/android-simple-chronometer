@@ -17,7 +17,11 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.carlosarroyo.android.chronometer.chronometer.ChronometerEngine;
+<<<<<<< HEAD
 import com.carlosarroyo.android.chronometer.notifications.ChronometerNotificationBuilder;
+=======
+import com.carlosarroyo.android.chronometer.Notifications.ChronometerNotificationBuilder;
+>>>>>>> origin/master
 
 /**
  * @author Carlos Alberto Arroyo Martinez <carlosarroyoam@gmail.com>
