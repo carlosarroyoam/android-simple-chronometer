@@ -26,4 +26,6 @@
     <dimen name="text_time_big_size">64sp</dimen>
     <dimen name="text_time_small_size">32sp</dimen>
 
+    <dimen name="layout_padding">8dp</dimen>
+
 </resources>

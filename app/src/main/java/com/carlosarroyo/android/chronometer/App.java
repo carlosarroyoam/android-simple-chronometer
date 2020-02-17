@@ -31,8 +31,8 @@ public class App extends Application {
 
 	private void createChronometerNotificationChannel() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			CharSequence name = getString(R.string.chrono_channel_name);
-			String description = getString(R.string.chrono_channel_description);
+			CharSequence name = getString(R.string.chronometer_channel_name);
+			String description = getString(R.string.chronometer_channel_description);
 			int importance = NotificationManager.IMPORTANCE_LOW;
 
 			NotificationChannel channel = new NotificationChannel(CHRONOMETER_CHANNEL_ID, name, importance);

@@ -14,12 +14,14 @@
     <string name="filter_title_chronos_app">Chronometer App</string>
 
     <string name="button_start_text">Start</string>
-    <string name="button_split_text">Split</string>
+    <string name="button_pause_text">Pause</string>
     <string name="button_reset_text">Reset</string>
-    <string name="chrono_channel_name">Chronomether Service</string>
-    <string name="chrono_channel_description">Chronometer service notification channel</string>
+    <string name="button_add_lap_text">Add lap</string>
+
+    <string name="chronometer_channel_name">Chronomether service</string>
+    <string name="chronometer_channel_description">Chronometer service notification channel</string>
+
     <string name="chronometer_notification_title">Chronometer</string>
     <string name="chronometer_notification_content">Content</string>
-    <string name="button_pause_text">Pause</string>
 
 </resources>
